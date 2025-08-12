@@ -85,10 +85,43 @@ To start the FastAPI backend server:
 The backend APIs can be tested using `pytest`. To run the tests, ensure your virtual environment is active and run:
 
 ```bash
-pytest
+python -m pytest
 ```
 
 This will discover and run all tests in the `tests/` directory.
+
+### Running Tests with Different Options
+
+```bash
+# Run tests with verbose output (recommended)
+python -m pytest -v
+
+# Run tests and show test collection
+python -m pytest --collect-only
+
+# Run a specific test file
+python -m pytest tests/test_api.py
+
+# Run a specific test function
+python -m pytest tests/test_api.py::test_auth_register_and_login_flow
+
+# Run tests matching a pattern
+python -m pytest -k "auth"
+```
+
+### Test Coverage
+
+Your project includes comprehensive tests covering:
+- **Authentication**: User registration, login, and JWT token generation
+- **Items**: CRUD operations, filtering, search, and authorization
+- **Claims**: Claim creation, management, and status updates
+
+### Test Database
+
+Tests use a separate SQLite test database for isolation:
+- Tests don't affect your MySQL production database
+- Database is automatically cleaned between tests
+- No additional setup required
 
 ### Example API Endpoints (Conceptual)
 
