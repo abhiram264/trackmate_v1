@@ -1,5 +1,5 @@
 from typing import Optional, List
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from datetime import datetime, date as Date
 from enum import Enum
 
@@ -31,7 +31,7 @@ class UserRoleEnum(str, Enum):
 # ---------- USER SCHEMAS ----------
 class UserBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    email: EmailStr
+    email: str
 
 
 class UserCreate(UserBase):
@@ -39,23 +39,24 @@ class UserCreate(UserBase):
     role: Optional[UserRoleEnum] = UserRoleEnum.USER
 
 
-class UserRead(UserBase):
+class UserRead(BaseModel):
     id: int
+    name: str
+    email: str
     role: str
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 
 class UserUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
 
 
 # ---------- ITEM SCHEMAS ----------
@@ -67,7 +68,8 @@ class ItemBase(BaseModel):
     date: Date
     image_url: Optional[str] = None
 
-    @validator('date')
+    @field_validator('date')
+    @classmethod
     def validate_date(cls, v):
         if v > Date.today():  # Fixed: Use Date.today() instead of date.today()
             raise ValueError('Date cannot be in the future')
@@ -87,7 +89,8 @@ class ItemUpdate(BaseModel):
     image_url: Optional[str] = None
     status: Optional[ItemStatusEnum] = None
 
-    @validator('date')
+    @field_validator('date')
+    @classmethod
     def validate_date(cls, v):
         if v and v > Date.today():  # Fixed: Use Date.today() instead of date.today()
             raise ValueError('Date cannot be in the future')
@@ -101,8 +104,7 @@ class ItemRead(ItemBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ItemWithOwner(ItemRead):
@@ -150,8 +152,7 @@ class ClaimRead(ClaimBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ClaimWithItem(ClaimRead):
@@ -226,7 +227,8 @@ class ItemFilters(BaseModel):
     limit: int = Field(25, ge=1, le=100)
     offset: int = Field(0, ge=0)
 
-    @validator('date_to')
+    @field_validator('date_to')
+    @classmethod
     def validate_date_range(cls, v, values):
         date_from = values.get('date_from')
         if date_from and v and date_from > v:
@@ -301,8 +303,7 @@ class NotificationRead(NotificationBase):
     is_read: bool = False
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------- VALIDATION HELPERS ----------

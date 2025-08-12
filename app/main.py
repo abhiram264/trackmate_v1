@@ -1,10 +1,21 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.routes import items, claims, auth
 from app.database import create_db_and_tables
 
-app = FastAPI(title="TrackMate API", version="1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    create_db_and_tables()
+    yield
+    # Shutdown
+    pass
+
+
+app = FastAPI(title="TrackMate API", version="1.0", lifespan=lifespan)
 
 # CORS for local frontend
 app.add_middleware(
@@ -19,11 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Create database tables on startup
-@app.on_event("startup")
-def on_startup():
-    create_db_and_tables()
 
 # Mount static folder for serving uploaded images
 app.mount("/static", StaticFiles(directory="static"), name="static")
