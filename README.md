@@ -5,7 +5,8 @@ TrackMate is a comprehensive application designed to manage and track various en
 
 ## Tech Stack (Backend)
 - **Python**: The core programming language used for backend development.
-- **Flask**: A lightweight WSGI web application framework for Python, used for building the RESTful APIs.
+- **FastAPI**: A modern, fast web framework for building APIs with Python based on standard Python type hints.
+- **Uvicorn**: A lightning-fast ASGI server implementation, used for running FastAPI applications.
 - **SQLAlchemy**: An SQL toolkit and Object-Relational Mapper (ORM) that provides a full suite of well-known persistence patterns for Python.
 - **MySQL**: A popular open-source relational database management system used for data storage.
 - **PyMySQL**: A pure Python MySQL client library for connecting to MySQL databases.
@@ -55,24 +56,29 @@ TrackMate is a comprehensive application designed to manage and track various en
     *Replace `username`, `password` with your MySQL credentials and `your_super_secret_key_here` with a strong, random key.*
 
 6.  **Initialize the database:**
-    If you have database migrations, you'll need to run them. Assuming you are using Flask-Migrate or similar, commands might look like:
-    ```bash
-    flask db upgrade
-    ```
-    *(Note: If you are not using Flask-Migrate, you might need to run a script to create tables, e.g., `python app/models.py` if your models file has table creation logic.)*
+    The database tables will be created automatically when you start the application for the first time.
 
 ## Running the Application
 
-To start the Flask backend server:
+To start the FastAPI backend server:
 
 1.  **Ensure your virtual environment is active.**
 
-2.  **Run the Flask application:**
+2.  **Run the FastAPI application with uvicorn:**
     ```bash
-    flask --app app.main run
+    uvicorn app.main:app --reload
     ```
 
-    The application will typically run on `http://127.0.0.1:5000`.
+    The application will typically run on `http://127.0.0.1:8000`.
+
+    **Optional flags:**
+    - `--reload`: Automatically reloads the server when code changes (development only)
+    - `--host 0.0.0.0`: Makes the server accessible from other devices on the network
+    - `--port 8000`: Specifies the port (default is 8000)
+
+3.  **Access the API documentation:**
+    - Interactive API docs (Swagger UI): `http://127.0.0.1:8000/docs`
+    - Alternative API docs (ReDoc): `http://127.0.0.1:8000/redoc`
 
 ## API Testing
 
@@ -89,10 +95,10 @@ This will discover and run all tests in the `tests/` directory.
 While specific endpoints will depend on your application's design, here are examples of common API interactions:
 
 -   **GET /api/items**: Retrieve a list of items.
--   **GET /api/items/<id>**: Retrieve a single item by ID.
+-   **GET /api/items/{id}**: Retrieve a single item by ID.
 -   **POST /api/items**: Create a new item (with a JSON body).
--   **PUT /api/items/<id>**: Update an existing item (with a JSON body).
--   **DELETE /api/items/<id>**: Delete an item by ID.
+-   **PUT /api/items/{id}**: Update an existing item (with a JSON body).
+-   **DELETE /api/items/{id}**: Delete an item by ID.
 
 You can use tools like `curl`, Postman, Insomnia, or write Python scripts to interact with these APIs.
 
@@ -100,10 +106,16 @@ You can use tools like `curl`, Postman, Insomnia, or write Python scripts to int
 
 ```bash
 # Example: Get all items
-curl -X GET http://127.0.0.1:5000/api/items
+curl -X GET http://127.0.0.1:8000/api/items
 
 # Example: Create a new item
-curl -X POST -H "Content-Type: application/json" -d '{"name": "New Item", "description": "This is a new item."}' http://127.0.0.1:5000/api/items
+curl -X POST -H "Content-Type: application/json" -d '{"name": "New Item", "description": "This is a new item."}' http://127.0.0.1:8000/api/items
 ```
 
-*(Note: The actual port and endpoint paths might vary based on your Flask application's configuration.)*
+*(Note: The actual port and endpoint paths might vary based on your FastAPI application's configuration.)*
+
+### Interactive API Documentation
+
+FastAPI automatically generates interactive API documentation:
+- **Swagger UI**: Visit `http://127.0.0.1:8000/docs` to explore and test your APIs interactively
+- **ReDoc**: Visit `http://127.0.0.1:8000/redoc` for an alternative documentation view
