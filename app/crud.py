@@ -31,7 +31,7 @@ def get_user_by_id(session: Session, user_id: int) -> Optional[models.User]:
 
 # ---------- ITEM CRUD ----------
 def create_item(session: Session, item: schemas.ItemCreate, owner_id: int) -> models.Item:
-    db_item = models.Item(**item.dict(), owner_id=owner_id)
+    db_item = models.Item(**item.model_dump(), owner_id=owner_id)
     session.add(db_item)
     session.commit()
     session.refresh(db_item)
@@ -116,7 +116,7 @@ def get_item_by_id(session: Session, item_id: int) -> Optional[models.Item]:
 
 
 def update_item(session: Session, db_item: models.Item, item_data: schemas.ItemUpdate) -> models.Item:
-    for key, value in item_data.dict(exclude_unset=True).items():
+    for key, value in item_data.model_dump(exclude_unset=True).items():
         setattr(db_item, key, value)
     session.add(db_item)
     session.commit()
@@ -225,7 +225,7 @@ def bulk_delete_items(session: Session, item_ids: List[int]) -> int:
 
 # ---------- CLAIM CRUD ----------
 def create_claim(session: Session, claim: schemas.ClaimCreate, claimer_id: int) -> models.Claim:
-    db_claim = models.Claim(**claim.dict(), claimer_id=claimer_id)
+    db_claim = models.Claim(**claim.model_dump(), claimer_id=claimer_id)
     session.add(db_claim)
     session.commit()
     session.refresh(db_claim)
