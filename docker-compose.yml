@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: trackmate
+      MYSQL_USER: trackmate
+      MYSQL_PASSWORD: trackmate
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -uroot -proot | grep 'mysqld is alive' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      DATABASE_URL: mysql+pymysql://trackmate:trackmate@db:3306/trackmate
+      SECRET_KEY: change_this_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./static:/app/static:ro
+
+volumes:
+  db_data:
+
+

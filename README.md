@@ -80,6 +80,62 @@ To start the FastAPI backend server:
     - Interactive API docs (Swagger UI): `http://127.0.0.1:8000/docs`
     - Alternative API docs (ReDoc): `http://127.0.0.1:8000/redoc`
 
+## Docker (Backend only)
+
+Quick start with Docker and MySQL:
+
+```bash
+# Build and start containers
+docker compose up -d --build
+
+# Follow API logs
+docker compose logs -f api
+```
+
+Services:
+- API: http://localhost:8000 (Swagger at /docs)
+- MySQL: internal service `db` (not exposed to host). Defaults: db `trackmate`, user `trackmate`, password `trackmate`.
+
+Run on another machine (no Python needed):
+```bash
+git clone <repo-url>
+cd trackmate_v1
+docker compose up -d --build
+```
+Open `http://localhost:8000/docs`. Stop with `docker compose down`.
+
+If you need host access to MySQL, add a port mapping under `db` in `docker-compose.yml`:
+```yaml
+ports:
+  - "3306:3306"
+```
+
+Environment variables used by the API container:
+- `DATABASE_URL` (example: `mysql+pymysql://trackmate:trackmate@db:3306/trackmate`)
+- `SECRET_KEY` (set a strong secret in production)
+
+Volumes:
+- `./uploads` is mounted into the container at `/app/uploads` for user-uploaded files
+- `./static` is mounted read-only at `/app/static`
+
+Stop and remove containers:
+```bash
+docker compose down
+```
+
+### Run tests inside Docker
+
+```bash
+# run test suite
+docker compose run --rm api pytest -q
+
+# verbose
+docker compose run --rm api pytest -v
+
+# coverage (optional)
+docker compose run --rm api sh -lc "pip install -q pytest-cov && pytest --cov=app -q"
+```
+
 ## API Testing
 
 The backend APIs can be tested using `pytest`. To run the tests, ensure your virtual environment is active and run:

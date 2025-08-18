@@ -8,3 +8,6 @@ python-jose
 python-multipart
 Pillow
 email-validator
+httpx
+pytest
+
